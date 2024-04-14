@@ -30,30 +30,30 @@ class PriceMachine():
                         if product_name and price is not None and weight is not None:
                             self.data.append([filename, product_name, price, weight, round(price / weight, 2)])
 
-    def search_items(self, headers):
+    def search_product_price_weight(self, headers):
         results = []
         for row in self.data:
             if re.search(headers, row[1], re.IGNORECASE):
                 results.append(row)
         return sorted(results, key=lambda x: x[2] / x[3])
 
-    def find_text(self, text):
-        results = self.search_items(text)
-        self.display_results(results)
+    def search_text(self, text):
+        results = self.search_product_price_weight(text)
+        self.consol_results(results)
         html_filename = 'search_results.html'
         self.export_to_html(results, html_filename)
         print(f"Результаты поиска сохранены в файле: {html_filename}")
-    def main(self, directory):
+    def main_load(self, directory):
         self.load_prices(directory)
 
         while True:
-            query = input("Введите текст для поиска (или 'exit' для завершения): ")
-            if query.lower() == 'exit' or query.lower() == 'учше':
+            enter = input("Введите текст для поиска (или 'exit' для завершения): ")
+            if enter.lower() == 'exit' or enter.lower() == 'учше':
                 print("Работа завершена.")
                 break
-            self.find_text(query)
+            self.search_text(enter)
 
-    def display_results(self, results):
+    def consol_results(self, results):
         headers = ['№', 'Наименование', 'цена', 'вес', 'цена за кг.', 'файл']
         numbered_results = [[i + 1] + result[1:] + [result[0]] for i, result in enumerate(results)]
         print(tabulate(numbered_results, headers=headers, tablefmt='pipe'))
@@ -69,4 +69,4 @@ class PriceMachine():
 if __name__ == "__main__":
     pm = PriceMachine()
     cur_directory = os.path.dirname(os.path.abspath(__file__))
-    pm.main(cur_directory)
+    pm.main_load(cur_directory)
