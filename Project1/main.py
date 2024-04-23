@@ -3,10 +3,8 @@ import data_plotting as dplt
 
 def main():
     print("Добро пожаловать в инструмент получения и построения графиков биржевых данных.")
-    print("Вот несколько примеров биржевых тикеров, которые вы можете рассмотреть: AAPL (Apple Inc), GOOGL (Alphabet "
-        "Inc), MSFT (Microsoft Corporation), AMZN (Amazon.com Inc), TSLA (Tesla Inc).")
-    print("Общие периоды времени для данных включают: 1д, 5д, 1мес, 3мес, 6мес, 1г, 2г, 5г, 10л, с начала года, "
-        "макс. (1d, 1w, 1mo, 1y, start_y, max)")
+    print("Вот несколько примеров биржевых тикеров, которые вы можете рассмотреть: AAPL (Apple Inc), GOOGL (Alphabet Inc), MSFT (Microsoft Corporation), AMZN (Amazon.com Inc), TSLA (Tesla Inc).")
+    print("Общие периоды времени для данных включают: 1д, 5д, 1мес, 3мес, 6мес, 1г, 2г, 5г, 10л, с начала года, макс. (1d, 1w, 1mo, 1y, start_y, max)")
 
     ticker = input("Введите тикер акции (например, «AAPL» для Apple Inc): ")
 
@@ -36,13 +34,7 @@ def main():
         filename = f'{ticker}_{period if period else f"{start_date}_to_{end_date}"}_stock_data.csv'
         dd.export_data_to_csv(stock_data, filename)
 
-        stock_data_with_indicators = dd.calculate_rsi(stock_data, window_size=5)
-        stock_data_with_indicators = dd.calculate_macd(stock_data_with_indicators, short_window=12, long_window=26,
-                                                       signal_window=9)
-
-        style = input("По желанию введите стиль графика (например, 'classic', 'ggplot', 'bmh', 'fivethirtyeight'): ")
-
-        dplt.create_and_save_plot(stock_data_with_indicators, ticker, period, start_date, end_date, style=style)
+        dplt.create_and_save_plot(stock_data, ticker, period, start_date, end_date)
     else:
         print(
             "Данные об акциях не были получены. Пожалуйста, проверьте введенные данные и повторите попытку.")
