@@ -22,18 +22,20 @@ def main():
         start_date = input("Введите дату начала анализа в формате 'ГГГГ-ММ-ДД' (например, '2022-01-01'): ")
         end_date = input("Введите дату окончания анализа в формате 'ГГГГ-ММ-ДД' (например, '2022-12-31'): ")
 
+    # Получение данных о биржевой акции
     stock_data = dd.fetch_stock_data(ticker, period, start=start_date, end=end_date)
 
     if stock_data is not None:
+        # Добавление скользящего среднего к данным
         stock_data = dd.add_moving_average(stock_data)
-
+        # Отображение средней цены закрытия акции за указанный период
         dd.calculate_and_display_average_price(stock_data, ticker)
-
+        # Отображение уведомления, если колебания превышают заданный порог
         dd.notify_if_strong_fluctuations(stock_data, ticker)
-
+        # Экспорт данных в файл CSV
         filename = f'{ticker}_{period if period else f"{start_date}_to_{end_date}"}_stock_data.csv'
         dd.export_data_to_csv(stock_data, filename)
-
+        # Расчет и построение графиков данных, скользящего среднего
         dplt.create_and_save_plot(stock_data, ticker, period, start_date, end_date)
     else:
         print(
