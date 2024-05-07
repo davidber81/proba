@@ -1,7 +1,9 @@
 import os
 import matplotlib.pyplot as plt
 
-def create_and_save_plot(data, ticker, period, start_date, end_date, filename = None):
+
+
+def create_and_save_plot(data, ticker, period, start_date, end_date, style, filename = None):
     """
     Создает и сохраняет интерактивный график на основе данных о биржевой акции.
     Параметры:
@@ -10,9 +12,12 @@ def create_and_save_plot(data, ticker, period, start_date, end_date, filename = 
         period: Период для данных.
         start_date: Дата начала анализа.
         end_date: Дата окончания анализа.
+        style (str, optional): Стиль графика. По умолчанию None.
         filename: Имя файла для сохранения графика. По умолчанию None.
     """
     try:
+        if style:
+            plt.style.use(style)
 
         fig, axs = plt.subplots(3, 1, figsize=(18, 25))
 

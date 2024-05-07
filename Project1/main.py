@@ -4,7 +4,7 @@ import logging
 
 # Настройка логирования
 logging.basicConfig(filename='stock_analysis.log', level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(message)s', encoding='utf-8')
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 def main():
     print("Добро пожаловать в инструмент получения и построения графиков биржевых данных.")
     print("Вот несколько примеров биржевых тикеров, которые вы можете рассмотреть: AAPL (Apple Inc), GOOGL (Alphabet Inc), MSFT (Microsoft Corporation), AMZN (Amazon.com Inc), TSLA (Tesla Inc).")
@@ -56,7 +56,10 @@ def main():
                                                        signal_window=9)
         logging.info("Рассчитаны RSI и MACD.")
 
-        dplt.create_and_save_plot(stock_data, ticker, period, start_date, end_date)
+        # Запрос выбора стиля графика
+        style = input("По желанию введите стиль графика (например, 'classic', 'ggplot', 'bmh', 'fivethirtyeight'): ")
+
+        dplt.create_and_save_plot(stock_data, ticker, period, start_date, end_date, style=style)
         logging.info("Создан и сохранен график с индикаторами.")
 
     else:
