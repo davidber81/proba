@@ -4,7 +4,7 @@ import logging
 
 # Настройка логирования
 logging.basicConfig(filename='stock_analysis.log', level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+                    format='%(asctime)s - %(levelname)s - %(message)s', encoding='utf-8')
 def main():
     print("Добро пожаловать в инструмент получения и построения графиков биржевых данных.")
     print("Вот несколько примеров биржевых тикеров, которые вы можете рассмотреть: AAPL (Apple Inc), GOOGL (Alphabet Inc), MSFT (Microsoft Corporation), AMZN (Amazon.com Inc), TSLA (Tesla Inc).")
@@ -45,21 +45,26 @@ def main():
         dd.notify_if_strong_fluctuations(stock_data, ticker)
         logging.info("Проверка на колебания завершена.")
 
+        # Вызов функции для расчета стандартного отклонения
+        std_deviation = dd.calculate_standard_deviation(stock_data)
+        logging.info("Рассчитано стандартное отклонение.")
+
         # Экспорт данных в файл CSV
         filename = f'{ticker}_{period if period else f"{start_date}_to_{end_date}"}_stock_data.csv'
         dd.export_data_to_csv(stock_data, filename)
         logging.info(f"Данные экспортированы в файл: {filename}")
 
         # Расчет и построение графиков данных, скользящего среднего, RSI, MACD
-        stock_data = dd.calculate_rsi(stock_data, window_size=5)
-        stock_data = dd.calculate_macd(stock_data, short_window=12, long_window=26,
+        stock_data_with_indicators = dd.calculate_rsi(stock_data, window_size=5)
+        stock_data_with_indicators = dd.calculate_macd(stock_data_with_indicators, short_window=12, long_window=26,
                                                        signal_window=9)
         logging.info("Рассчитаны RSI и MACD.")
 
         # Запрос выбора стиля графика
         style = input("По желанию введите стиль графика (например, 'classic', 'ggplot', 'bmh', 'fivethirtyeight'): ")
 
-        dplt.create_and_save_plot(stock_data, ticker, period, start_date, end_date, style=style)
+        dplt.create_and_save_plot(stock_data_with_indicators, ticker, period, start_date, end_date, std_deviation,
+                                  style=style)
         logging.info("Создан и сохранен график с индикаторами.")
 
     else:

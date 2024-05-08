@@ -1,19 +1,20 @@
 import os
 import matplotlib.pyplot as plt
+import pandas as pd
 
-
-
-def create_and_save_plot(data, ticker, period, start_date, end_date, style, filename = None):
+def create_and_save_plot(data: pd.DataFrame, ticker: str, period: str, start_date: str, end_date: str,
+                         std_deviation: float, style: str = None, filename: str = None) -> None:
     """
     Создает и сохраняет интерактивный график на основе данных о биржевой акции.
-    Параметры:
-        data: Данные о биржевой акции в формате DataFrame.
-        ticker: Тикер акции.
-        period: Период для данных.
-        start_date: Дата начала анализа.
-        end_date: Дата окончания анализа.
+    Parameters:
+        data (pd.DataFrame): Данные о биржевой акции в формате DataFrame.
+        ticker (str): Тикер акции.
+        period (str): Период для данных.
+        start_date (str): Дата начала анализа.
+        end_date (str): Дата окончания анализа.
+        std_deviation (float): Стандартное отклонение цены закрытия.
         style (str, optional): Стиль графика. По умолчанию None.
-        filename: Имя файла для сохранения графика. По умолчанию None.
+        filename (str, optional): Имя файла для сохранения графика. По умолчанию None.
     """
     try:
         if style:
@@ -25,7 +26,7 @@ def create_and_save_plot(data, ticker, period, start_date, end_date, style, file
         axs[0].plot(data.index, data['Close'], label='Цена закрытия', color='blue')
         axs[0].plot(data.index, data['Moving_Average'], label='Скользящее среднее', color='orange')
         fill_label = 'Стандартное отклонение'
-        axs[0].fill_between(data.index, data['Close'] - data['Close'], color='lightblue',
+        axs[0].fill_between(data.index, data['Close'] - std_deviation, data['Close'] + std_deviation, color='lightblue',
                             alpha=0.5, label=fill_label)
         axs[0].set_ylabel('Цена')
         axs[0].set_title(f"\nЦены акций {ticker}, скользящее среднее и стандартное отклонение\n", fontweight='bold',
