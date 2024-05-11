@@ -4,20 +4,29 @@ import logging
 
 # Настройка логирования
 logging.basicConfig(filename='stock_analysis.log', level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(message)s', encoding='utf-8')
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
+
 def main():
     print("Добро пожаловать в инструмент получения и построения графиков биржевых данных.")
-    print("Вот несколько примеров биржевых тикеров, которые вы можете рассмотреть: AAPL (Apple Inc), GOOGL (Alphabet Inc), MSFT (Microsoft Corporation), AMZN (Amazon.com Inc), TSLA (Tesla Inc).")
-    print("Общие периоды времени для данных включают: 1д, 5д, 1мес, 3мес, 6мес, 1г, 2г, 5г, 10л, с начала года, макс. (1d, 1w, 1mo, 1y, start_y, max)")
+    print(
+        "Вот несколько примеров биржевых тикеров, которые вы можете рассмотреть: AAPL (Apple Inc), GOOGL (Alphabet "
+        "Inc), MSFT (Microsoft Corporation), AMZN (Amazon.com Inc), TSLA (Tesla Inc).")
+    print(
+        "Общие периоды времени для данных включают: 1д, 5д, 1мес, 3мес, 6мес, 1г, 2г, 5г, 10л, с начала года, "
+        "макс. (1d, 1w, 1mo, 1y, start_y, max)")
 
+    # Запрос тикера акции
     ticker = input("Введите тикер акции (например, «AAPL» для Apple Inc): ").upper()
     logging.info(f"Выбран тикер акции: {ticker}")
 
+    # Проверка наличия тикера перед запросом периода
     if not ticker:
         logging.error("Тикер акции не был введен. Программа завершена.")
         print("Тикер акции не был введен. Повторите попытку.")
         return
 
+    # Запрос периода для данных
     period = input("Введите период для данных (например, '1mo' для одного месяца), либо пропустите (enter) для ввода "
                    "конкретных дат: ")
     logging.info(f"Выбран период для данных: {period}")
@@ -25,10 +34,12 @@ def main():
     start_date = None
     end_date = None
 
+    # Если период не указан, запрашиваем конкретные даты
     if not period:
         start_date = input("Введите дату начала анализа в формате 'ГГГГ-ММ-ДД' (например, '2022-01-01'): ")
         end_date = input("Введите дату окончания анализа в формате 'ГГГГ-ММ-ДД' (например, '2022-12-31'): ")
         logging.info(f"Выбраны конкретные даты для анализа: {start_date} - {end_date}")
+
     # Получение данных о биржевой акции
     stock_data = dd.fetch_stock_data(ticker, period, start=start_date, end=end_date)
 
@@ -41,13 +52,13 @@ def main():
         dd.calculate_and_display_average_price(stock_data, ticker)
         logging.info(f"Отображена средняя цена закрытия акции за указанный период период.")
 
-        # Отображение уведомления, если колебания превышают заданный порог
-        dd.notify_if_strong_fluctuations(stock_data, ticker)
-        logging.info("Проверка на колебания завершена.")
-
         # Вызов функции для расчета стандартного отклонения
         std_deviation = dd.calculate_standard_deviation(stock_data)
         logging.info("Рассчитано стандартное отклонение.")
+
+        # Отображение уведомления, если колебания превышают заданный порог
+        dd.notify_if_strong_fluctuations(stock_data, ticker)
+        logging.info("Проверка на колебания завершена.")
 
         # Экспорт данных в файл CSV
         filename = f'{ticker}_{period if period else f"{start_date}_to_{end_date}"}_stock_data.csv'
@@ -67,10 +78,12 @@ def main():
                                   style=style)
         logging.info("Создан и сохранен график с индикаторами.")
 
+        dplt.create_and_show_plot(stock_data_with_indicators, ticker, std_deviation)
+        logging.info("В браузере выведен интерактивный график с индикаторами.")
+
     else:
         logging.error("Данные об акциях не были получены. Проверьте введенные данные и повторите попытку.")
         print("Данные об акциях не были получены. Пожалуйста, проверьте введенные данные и повторите попытку.")
-
 
 if __name__ == "__main__":
     main()

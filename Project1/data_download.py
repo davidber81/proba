@@ -139,6 +139,7 @@ def calculate_macd(data: pd.DataFrame, short_window=12, long_window=26, signal_w
         print(f"\nОшибка при расчёте MACD: {e}")
         return None
 
+
 def calculate_standard_deviation(data: pd.DataFrame):
     """
     Принимает DataFrame с данными о цене закрытия акций и вычисляет стандартное отклонение.
