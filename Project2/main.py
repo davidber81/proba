@@ -30,6 +30,11 @@ class DrawingApp:
 
         self.canvas.bind('<B1-Motion>', self.paint)
         self.canvas.bind('<ButtonRelease-1>', self.reset)
+        self.canvas.bind('<Button-3>', self.pick_color)
+
+        # Добавление горячих клавиш
+        self.root.bind('<Control-s>', self.save_image)
+        self.root.bind('<Control-c>', self.choose_color)
 
     def setup_ui(self):
         """
@@ -46,6 +51,9 @@ class DrawingApp:
 
         brush_button = tk.Button(control_frame, text="Кисть", command=self.use_brush)
         brush_button.pack(side=tk.LEFT)
+
+        eraser_button = tk.Button(control_frame, text="Ластик", command=self.use_eraser)
+        eraser_button.pack(side=tk.LEFT)
 
         save_button = tk.Button(control_frame, text="Сохранить", command=self.save_image)
         save_button.pack(side=tk.LEFT)
@@ -123,6 +131,13 @@ class DrawingApp:
             self.pen_color = color[1]
             self.last_color = self.pen_color
 
+    def use_eraser(self):
+        """
+        Переключает режим на ластика.
+        """
+        self.last_color = self.pen_color
+        self.pen_color = 'white'
+
     def use_brush(self):
         """
         Переключает режим на кисть.
@@ -140,6 +155,19 @@ class DrawingApp:
                 file_path += '.png'
             self.image.save(file_path)
             messagebox.showinfo("Информация", f"Изображение успешно сохранено {file_path}")
+
+    def rgb_to_hex(self, rgb):
+        """Преобразует кортеж RGB в шестнадцатеричный код цвета."""
+        return '#{:02x}{:02x}{:02x}'.format(*rgb)
+
+    def pick_color(self, event):
+        """
+        Извлекает цвет пикселя в месте клика правой кнопкой мыши и устанавливает его в качестве текущего цвета кисти.
+        """
+        if 0 <= event.x < self.image.width and 0 <= event.y < self.image.height:
+            pixel_color = self.image.getpixel((event.x, event.y))
+            self.pen_color = self.rgb_to_hex(pixel_color)  # Преобразование в шестнадцатеричный цвет
+            self.last_color = self.pen_color  # Обновляем последний выбранный цвет
 def main():
     root = tk.Tk()
     DrawingApp(root)
