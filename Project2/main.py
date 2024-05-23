@@ -2,12 +2,11 @@ import tkinter as tk
 from tkinter import colorchooser, filedialog, messagebox
 from PIL import Image, ImageDraw
 
+
 class DrawingApp:
     def __init__(self, root):
         """
         Инициализирует приложение для рисования.
-        Параметры:
-            root (tk.Tk): Корневой виджет Tkinter.
         """
         self.brush_size_scale = None
         self.root = root
@@ -22,17 +21,16 @@ class DrawingApp:
         self.brush_size = tk.IntVar()
         self.brush_size.set(1)
 
-        self.setup_ui()
-
         self.last_x, self.last_y = None, None
         self.pen_color = 'black'
         self.last_color = 'black'
+
+        self.setup_ui()
 
         self.canvas.bind('<B1-Motion>', self.paint)
         self.canvas.bind('<ButtonRelease-1>', self.reset)
         self.canvas.bind('<Button-3>', self.pick_color)
 
-        # Добавление горячих клавиш
         self.root.bind('<Control-s>', self.save_image)
         self.root.bind('<Control-c>', self.choose_color)
 
@@ -46,8 +44,16 @@ class DrawingApp:
         clear_button = tk.Button(control_frame, text="Очистить", command=self.clear_canvas)
         clear_button.pack(side=tk.LEFT)
 
-        color_button = tk.Button(control_frame, text="Выбрать цвет", command=self.choose_color)
+        # Фрейм для кнопки выбора цвета и предварительного просмотра:
+        color_frame = tk.Frame(control_frame)
+        color_frame.pack(side=tk.LEFT)
+
+        color_button = tk.Button(color_frame, text="Выбрать цвет", command=self.choose_color)
         color_button.pack(side=tk.LEFT)
+
+        # Виджет для предварительного просмотра цвета:
+        self.color_preview = tk.Label(color_frame, text=" ", bg=self.pen_color, width=2, height=1)
+        self.color_preview.pack(side=tk.LEFT, padx=(0, 10))
 
         brush_button = tk.Button(control_frame, text="Кисть", command=self.use_brush)
         brush_button.pack(side=tk.LEFT)
@@ -70,9 +76,6 @@ class DrawingApp:
     def create_brush_size_menu(self, parent, sizes):
         """
         Создает меню выбора размера кисти.
-        Параметры:
-            parent (tk.Frame): Родительский фрейм для размещения меню.
-            sizes (list): Список размеров кисти.
         """
         size_menu = tk.OptionMenu(parent, self.brush_size, *sizes, command=self.update_brush_size)
         size_menu.pack(side=tk.LEFT)
@@ -87,16 +90,12 @@ class DrawingApp:
     def update_brush_size(self, value):
         """
         Обновляет размер кисти.
-        Параметры:
-            value: Новое значение размера кисти.
         """
         self.brush_size.set(value)
 
     def paint(self, event):
         """
         Рисует на холсте при движении мыши.
-        Параметры:
-            event: Событие мыши.
         """
         if self.last_x and self.last_y:
             self.canvas.create_line(self.last_x, self.last_y, event.x, event.y,
@@ -130,6 +129,7 @@ class DrawingApp:
         if color[1]:
             self.pen_color = color[1]
             self.last_color = self.pen_color
+            self.update_color_preview()  # Обновление цвета предварительного просмотра
 
     def use_eraser(self):
         """
@@ -166,12 +166,21 @@ class DrawingApp:
         """
         if 0 <= event.x < self.image.width and 0 <= event.y < self.image.height:
             pixel_color = self.image.getpixel((event.x, event.y))
-            self.pen_color = self.rgb_to_hex(pixel_color)  # Преобразование в шестнадцатеричный цвет
-            self.last_color = self.pen_color  # Обновляем последний выбранный цвет
+            self.pen_color = self.rgb_to_hex(pixel_color)
+            self.last_color = self.pen_color
+
+    def update_color_preview(self):
+        """
+        Обновляет цвет предварительного просмотра.
+        """
+        self.color_preview.config(bg=self.pen_color)
+
+
 def main():
     root = tk.Tk()
     DrawingApp(root)
     root.mainloop()
+
 
 if __name__ == "__main__":
     main()
