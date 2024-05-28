@@ -1,13 +1,11 @@
 from selenium import webdriver
 import bs4
 from time import sleep
-import requests
-from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime
 import csv
 
-def parser() -> dict:
+def write_cmc_top() -> dict:
     """Парсит сайт coinmarketcap.com. Берет данные(наименование, капитализация) первых 100 криптовалют"""
     driver = webdriver.Chrome()
     driver.get('https://coinmarketcap.com/')
@@ -34,21 +32,20 @@ def parser() -> dict:
         capitalization = capitalization.find_all('span')[1].get_text()
         total_capitalization_num = int(float(capitalization.replace(',', '').replace('$', '')))  # Преобразуем в целое число
         total_capitalization += total_capitalization_num
-        data.append({'Name': name, 'MC': capitalization})
-        #
-        #     # Преобразуем data в датафрейм pandas и рассчитаем MP - Market percentage (процент рынка) по каждой крипте
+        data.append({'Name': name, 'MC': total_capitalization_num})
+        # Преобразуем data в датафрейм pandas и рассчитаем MP - Market percentage (процент рынка) по каждой крипте
         df = pd.DataFrame(data)
-        df['MP'] = df['MC'] / total_capitalization * 100
+        df['MP'] = (df['MC'] / total_capitalization) * 100
         df['MP'] = df['MP'].round(0).astype(int).astype(str) + '%'
         df['MC'] = df['MC'].apply(lambda x: f'{x:,}')
         #
         # Выведем получившийся датафрейм в консоль
         print(df)
-        #
+
         # Сохраним DataFrame в CSV, используя пробел в качестве разделителя
         file_name = f'{datetime.now().hour}.{datetime.now().minute} {datetime.now().strftime("%d.%m.%Y")}.csv'
         df.to_csv(file_name, sep=' ', index=False, quoting=csv.QUOTE_NONNUMERIC)
         name_capitalization[name] = capitalization
     return name_capitalization
 
-parser()
+write_cmc_top()
