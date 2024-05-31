@@ -19,7 +19,6 @@ class DrawingApp:
 
         self.brush_size = tk.IntVar()
         self.brush_size.set(1)
-
         self.style_var = tk.StringVar()
         self.style_var.set('round')
 
@@ -32,7 +31,6 @@ class DrawingApp:
         self.canvas.bind('<B1-Motion>', self.paint)
         self.canvas.bind('<ButtonRelease-1>', self.reset)
         self.canvas.bind('<Button-3>', self.pick_color)
-
         self.root.bind('<Control-s>', self.save_image)
         self.root.bind('<Control-c>', self.choose_color)
 
@@ -46,17 +44,13 @@ class DrawingApp:
         clear_button = tk.Button(control_frame, text="Очистить", command=self.clear_canvas)
         clear_button.pack(side=tk.LEFT)
 
-        # Фрейм для кнопки выбора цвета и предварительного просмотра:
-        color_frame = tk.Frame(control_frame)
-        color_frame.pack(side=tk.LEFT)
-
         resize_button = tk.Button(control_frame, text="Изменить размер холста", command=self.resize_canvas)
         resize_button.pack(side=tk.LEFT)
 
-        color_button = tk.Button(color_frame, text="Выбрать цвет", command=self.choose_color)
+        color_button = tk.Button(control_frame, text="Выбрать цвет", command=self.choose_color)
         color_button.pack(side=tk.LEFT)
 
-        self.color_preview = tk.Label(color_frame, text=" ", bg=self.pen_color, width=2, height=1)
+        self.color_preview = tk.Label(control_frame, text=" ", bg=self.pen_color, width=2, height=1)
         self.color_preview.pack(side=tk.LEFT, padx=(0, 10))
 
         eraser_button = tk.Button(control_frame, text="Ластик", command=self.use_eraser)
@@ -67,6 +61,12 @@ class DrawingApp:
 
         brush_button = tk.Button(control_frame, text="Кисть", command=self.use_brush)
         brush_button.pack(side=tk.LEFT)
+
+        text_button = tk.Button(control_frame, text="Текст", command=self.add_text)
+        text_button.pack(side=tk.LEFT)
+
+        bg_button = tk.Button(control_frame, text="Изменить фон", command=self.change_bg_color)
+        bg_button.pack(side=tk.LEFT)
 
         style_label = tk.Label(control_frame, text="Стиль кисти:")
         style_label.pack(side=tk.LEFT, padx=(5, 2))
@@ -160,6 +160,7 @@ class DrawingApp:
         """
         self.last_color = self.pen_color
         self.pen_color = 'white'
+        self.update_color_preview()
 
     def use_brush(self):
         """
@@ -167,6 +168,7 @@ class DrawingApp:
         """
         self.pen_color = self.last_color
         self.last_color = self.pen_color
+        self.update_color_preview()
 
     def save_image(self):
         """
@@ -191,12 +193,44 @@ class DrawingApp:
             pixel_color = self.image.getpixel((event.x, event.y))
             self.pen_color = self.rgb_to_hex(pixel_color)
             self.last_color = self.pen_color
+            self.update_color_preview()
 
     def update_color_preview(self):
         """
         Обновляет цвет предварительного просмотра.
         """
         self.color_preview.config(bg=self.pen_color)
+
+    def add_text(self):
+        """
+        Добавляет текст на холст.
+        """
+        text = simpledialog.askstring("Ввод текста", "Введите текст:")
+        if text:
+            self.text_mode = True
+            self.current_text = text
+            self.canvas.bind('<Button-1>', self.place_text)
+
+    def place_text(self, event):
+        """
+        Размещает введенный текст на холсте.
+        """
+        if self.text_mode:
+            x, y = event.x, event.y
+            self.canvas.create_text(x, y, text=self.current_text, fill=self.pen_color, anchor='nw')
+            self.draw.text((x, y), self.current_text, fill=self.pen_color)
+            self.text_mode = False
+            self.canvas.unbind('<Button-1>')
+
+    def change_bg_color(self):
+        """
+        Изменяет цвет фона холста.
+        """
+        color = colorchooser.askcolor(title="Выбрать цвет фона")
+        if color[1]:
+            self.canvas.config(bg=color[1])
+            self.image = Image.new("RGB", (self.canvas.winfo_width(), self.canvas.winfo_height()), color[1])
+            self.draw = ImageDraw.Draw(self.image)
 def main():
     root = tk.Tk()
     DrawingApp(root)
