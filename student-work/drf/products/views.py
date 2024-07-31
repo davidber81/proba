@@ -44,7 +44,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         product = Product.objects.filter(articule=articule)
         if product.exists():
             product.delete()
-            return Response({"message": "Товар успешно удален"}, status=204)
+            return Response({"message": "Товар успешно удален"}, status=410)
         return Response({"message": "Товар с таким артикулом не найден"}, status=404)
 
     def partial_update(self, request, *args, **kwargs):
@@ -71,9 +71,9 @@ class ProductViewSet(viewsets.ModelViewSet):
         try:
             for articule in data:
                 Product.objects.filter(articule__in=articule).delete()
-            return Response({'message': 'Товар успешно удален'}, status=204)
+            return Response({'message': 'Товары успешно удалены'}, status=410)
         except:
-            return Response({'error': 'Ошибка при удалении товара'}, status=500)
+            return Response({'error': 'Товары с такими артикулами не найдены'}, status=404)
 
 
     def perform_create(self, serializer):

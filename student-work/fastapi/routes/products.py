@@ -94,7 +94,7 @@ async def get_product(
         user: Annotated[str, Depends(get_current_user)],
         session: AsyncSession = Depends(get_session),
     ):
-    """Хэндлер детального обзора товра по артикулу
+    """Хэндлер детального обзора товара по артикулу
 
     Args:
         articule (str): артикул товара
